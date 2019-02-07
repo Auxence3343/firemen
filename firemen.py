@@ -1,23 +1,25 @@
 from tkinter import *
 
 
-def routine(root):
-    """ la fonction qui s'execute en boucle
-    a chaque rendu d'image"""
+class App:
+    def __init__(self, hauteur, largeur):
+        self.root = Tk()
+        self.root.title = "Firemen"
+        self.hauteur = hauteur
+        self.largeur = largeur
+        self.canvas = Canvas(self.root,\
+                             width=self.largeur,\
+                             height=self.hauteur)
 
-    root.after(0, routine, root)
+        self.root.mainloop()
+
+    def refresh(self):
+        pass
 
 
 def main():
-    root = Tk()
-    root.title = "Firemen"
-    canvas = Canvas(root, width=640, height=400)
-    canvas.pack()
-
-    #routine(root)
-
-    root.mainloop()
+    firemen = App(hauteur=640, largeur=400)
 
 
-if __name__ == "__main__" :
+if __name__ == "__main__":
     main()

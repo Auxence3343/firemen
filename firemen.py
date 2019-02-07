@@ -11,8 +11,10 @@ def routine(root):
 def main():
     root = Tk()
     root.title = "Firemen"
+    canvas = Canvas(root, width=640, height=400)
+    canvas.pack()
 
-    routine(root)
+    #routine(root)
 
     root.mainloop()
 

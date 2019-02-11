@@ -11,15 +11,18 @@ class App:
         self.canvas = Canvas(self.root, width=self.largeur, height=self.hauteur, background="#000")
         self.canvas.pack()
 
-        test = Image(50, 50, "arbre.gif", self.canvas)
-        sleep(1)
-        test.move_to(100, 100)
+        self.compte = 40
+        self.refresh()
         self.root.mainloop()
 
     def get_canvas(self):
         return self.canvas
 
     def refresh(self):
+        sleep(1)
+        test = Image(50, 50, "arbre.gif", self.canvas)
+        self.compte += 1
+        test.move_to((self.compte % (600 / 16)) * 16, 100)
         self.canvas.update()
         self.root.after(0, self.refresh)
 

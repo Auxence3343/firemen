@@ -29,6 +29,7 @@ class App:
 
 def main():
     firemen = App(hauteur=400, largeur=640)
+    del firemen
 
 
 if __name__ == "__main__":

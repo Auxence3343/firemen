@@ -1,7 +1,6 @@
+from time import *
 from tkinter import *
 from classes_images import *
-from time import *
-
 
 class App:
     def __init__(self, hauteur, largeur):
@@ -21,7 +20,8 @@ class App:
         return self.canvas
 
     def refresh(self):
-        pass
+        self.canvas.update()
+        self.root.after(0, self.refresh)
 
 
 def main():

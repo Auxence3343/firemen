@@ -1,4 +1,6 @@
 from tkinter import *
+from classes_images import *
+from time import *
 
 
 class App:
@@ -7,18 +9,23 @@ class App:
         self.root.title = "Firemen"
         self.hauteur = hauteur
         self.largeur = largeur
-        self.canvas = Canvas(self.root,\
-                             width=self.largeur,\
-                             height=self.hauteur)
+        self.canvas = Canvas(self.root, width=self.largeur, height=self.hauteur, background="#000")
+        self.canvas.pack()
 
+        test = Image(50, 50, "arbre.gif", self.canvas)
+        sleep(1)
+        test.move_to(100, 100)
         self.root.mainloop()
+
+    def get_canvas(self):
+        return self.canvas
 
     def refresh(self):
         pass
 
 
 def main():
-    firemen = App(hauteur=640, largeur=400)
+    firemen = App(hauteur=400, largeur=640)
 
 
 if __name__ == "__main__":

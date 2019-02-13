@@ -5,6 +5,7 @@ from classes_images import *
 
 class App:
     def __init__(self, hauteur, largeur):
+        """ initialise les variables 'globales' de l'application et lance le jeu"""
         self.root = Tk()
         self.root.title("Firemen")
         self.hauteur = hauteur
@@ -16,10 +17,8 @@ class App:
         self.refresh()
         self.root.mainloop()
 
-    def get_canvas(self):
-        return self.canvas
-
     def refresh(self):
+        """ fonction qui se relance a chaque 'tick' du jeu"""
         self.canvas.update()
         test = Image(8, 8, "arbre.gif", self.canvas)
         self.compte += 1

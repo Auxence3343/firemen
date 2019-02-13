@@ -23,18 +23,6 @@ class Map:
         self.list_heat_points = []
         self.list_heat_points_visited = []
 
-    def cursor(self, x, y, layer, distance):
-        """ méthode recursive qui passe par toute les cases du terrain"""
-        # print("------\n", layer, x, y, "\n------")
-        voisins = [(x, y + 1), (x + 1, y), (x - 1, y), (x, y - 1)]
-        for case in voisins:
-            if 0 <= case[0] <= self.largeur - 1 and 0 <= case[1] <= self.hauteur - 1:
-                if not ((case[0], case[1]) in self.list_heat_points_visited[layer]):
-                    self.list_heat_points_visited[layer].append((case[0], case[1]))
-                    self.list_heat_points[layer].append((case[0], case[1], distance))
-                    self.cursor(case[0], case[1], layer, distance + 1)
-                    # print(case)
-
     def generate_heat_map_layer(self):
         """ crée une couche de la heat map """
 

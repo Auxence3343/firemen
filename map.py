@@ -17,11 +17,12 @@ class Map:
         self.hauteur = hauteur
         self.largeur = largeur
         self.heat_map_layer = []
-        self.map = [["."] * hauteur] * largeur
         self.list_heat_points = []
         self.list_heat_points_visited = []
         self.heat_map = []
-        self.ascii_map = []
+        self.map = []
+
+        self.make_map("/\\", "##", "..")
 
     def generate_heat_map_layer(self):
         """ crée une couche de la heat map """
@@ -58,13 +59,13 @@ class Map:
                 point = ceil(sqrt(point))  # uniformise les valeurs des points
                 self.heat_map[y].append(point)
 
-    def make_ascii_map(self, arbre, buisson, herbe):
+    def make_map(self, arbre, buisson, herbe):
         """ construit une version ascii de la map"""
         nb_bosquets = ceil(sqrt(self.hauteur * self.largeur) / 10)
         self.make_heat_map(nb_bosquets)
-        self.ascii_map = []
+        self.map = []
         for y in range(0, self.hauteur):
-            self.ascii_map.append([])
+            self.map.append([])
             for x in range(0, self.largeur):
                 if self.heat_map[y][x] <= 2:  # haute densité
                     proba_grand_arbre = 0.9
@@ -81,20 +82,20 @@ class Map:
                 valeur_aleatoire = randint(0, 100) / 100
 
                 if valeur_aleatoire < proba_grand_arbre:
-                    self.ascii_map[y].append(arbre)
+                    self.map[y].append(arbre)
                 elif valeur_aleatoire > (1 - proba_herbe):
-                    self.ascii_map[y].append(herbe)
+                    self.map[y].append(herbe)
                 else:
-                    self.ascii_map[y].append(buisson)
+                    self.map[y].append(buisson)
 
         display(self.heat_map)
-        display(self.ascii_map)
+        display(self.map)
 
 
 def main():
     """teste la generation de map"""
     map_de_test = Map(30, 30)
-    map_de_test.make_ascii_map("/\\", "##", "..")
+    map_de_test.make_map("/\\", "##", "..")
 
 
 if __name__ == "__main__":

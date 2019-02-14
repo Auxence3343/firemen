@@ -1,6 +1,7 @@
 from time import *
 from tkinter import *
 from classes_images import *
+from map import *
 
 
 class App:
@@ -13,17 +14,15 @@ class App:
         self.canvas = Canvas(self.root, width=self.largeur, height=self.hauteur, background="#000")
         self.canvas.pack()
 
-        self.compte = 40
+        self.map = Map(20, 10)
+        
         self.refresh()
         self.root.mainloop()
 
     def refresh(self):
         """ fonction qui se relance a chaque 'tick' du jeu"""
         self.canvas.update()
-        test = Image(8, 8, "arbre.gif", self.canvas)
-        self.compte += 1
-        test.move_to(self.compte % 37 * 16, 0)
-        sleep(0.2)
+
         self.root.after(0, self.refresh)
 
 

@@ -7,10 +7,6 @@ def display(carte):
     for y in carte:
         print("| ", end="")
         for x in y:
-            #if x < 10:
-            #    print("0" + str(x), "| ", end="")
-            #else:
-            #    print(x, "| ", end="")
             print(x, "| ", end="")
         print("")
 
@@ -57,12 +53,12 @@ class Map:
                 point = self.hauteur * self.largeur  # pour être sûr que les résultats ne sont pas faussés
 
                 for couche in range(nb_points):  # additionne les différentes couches
-                    if self.heat_map_layer[couche][x][y] < point:
-                        point = self.heat_map_layer[couche][x][y]
+                    if self.heat_map_layer[couche][y][x] < point:
+                        point = self.heat_map_layer[couche][y][x]
                 point = ceil(sqrt(point))  # uniformise les valeurs des points
                 self.heat_map[y].append(point)
 
-    def make_map(self, arbre, buisson, herbe):
+    def make_ascii_map(self, arbre, buisson, herbe):
         """ construit une version ascii de la map"""
         nb_bosquets = ceil(sqrt(self.hauteur * self.largeur) / 10)
         self.make_heat_map(nb_bosquets)
@@ -71,24 +67,34 @@ class Map:
             self.ascii_map.append([])
             for x in range(0, self.largeur):
                 if self.heat_map[y][x] <= 2:  # haute densité
-                    proba_grand_arbre = 0.7
-                    proba_herbe = 0.2
-                    proba_buisson = 0.1
-                elif 3 >= self.heat_map[y][x] >= 4:  # moyenne densité
+                    proba_grand_arbre = 0.9
+                    proba_herbe = 0.1
+
+                elif self.heat_map[y][x] == 3:  # moyenne densité
                     proba_grand_arbre = 0.2
                     proba_herbe = 0.2
-                    proba_buisson = 0.6
 
+                else:  # basse densité
+                    proba_grand_arbre = 0.1
+                    proba_herbe = 0.8
 
+                valeur_aleatoire = randint(0, 100) / 100
 
+                if valeur_aleatoire < proba_grand_arbre:
+                    self.ascii_map[y].append(arbre)
+                elif valeur_aleatoire > (1 - proba_herbe):
+                    self.ascii_map[y].append(herbe)
+                else:
+                    self.ascii_map[y].append(buisson)
 
+        display(self.heat_map)
+        display(self.ascii_map)
 
 
 def main():
     """teste la generation de map"""
     map_de_test = Map(30, 30)
-    map_de_test.make_map("O", "#", ".")
-    display(map_de_test.heat_map)
+    map_de_test.make_ascii_map("/\\", "##", "..")
 
 
 if __name__ == "__main__":

@@ -7,51 +7,88 @@ def display(carte):
     for y in carte:
         print("| ", end="")
         for x in y:
-            if x < 10:
-                print("0" + str(x), "| ", end="")
-            else:
-                print(x, "| ", end="")
+            #if x < 10:
+            #    print("0" + str(x), "| ", end="")
+            #else:
+            #    print(x, "| ", end="")
+            print(x, "| ", end="")
         print("")
+
 
 class Map:
     def __init__(self, largeur, hauteur):
         """ crée la map"""
         self.hauteur = hauteur
         self.largeur = largeur
-        self.heat_map = []
+        self.heat_map_layer = []
         self.map = [["."] * hauteur] * largeur
         self.list_heat_points = []
         self.list_heat_points_visited = []
+        self.heat_map = []
+        self.ascii_map = []
 
     def generate_heat_map_layer(self):
         """ crée une couche de la heat map """
 
-        self.heat_map.append([])
+        self.heat_map_layer.append([])
         self.list_heat_points_visited.append([])
         self.list_heat_points.append([])
-        layer = len(self.heat_map) - 1
+        layer = len(self.heat_map_layer) - 1
         x = randint(0, self.hauteur - 1)
         y = randint(0, self.largeur - 1)
 
-        self.cursor(x, y, layer, 0)
-
         for y_list in range(self.hauteur):
-            self.heat_map[layer].append([])
+            self.heat_map_layer[layer].append([])
             for x_list in range(self.largeur):
                 value = ceil(sqrt((x - x_list) ** 2 + (y - y_list) ** 2))
-                self.heat_map[layer][y_list].append(value)
+                self.heat_map_layer[layer][y_list].append(value)
 
     def make_heat_map(self, nb_points):
         """ génère une matrice contenant la probabilité d'apparition d'un arbre pour chaque case"""
         for point in [None] * nb_points:
             self.generate_heat_map_layer()
 
+        # addition des couches de la heat_map
+        self.heat_map = []
+
+        for y in range(0, self.hauteur):  # passe par toutes les cases de la map
+            self.heat_map.append([])
+            for x in range(0, self.largeur):
+                point = self.hauteur * self.largeur  # pour être sûr que les résultats ne sont pas faussés
+
+                for couche in range(nb_points):  # additionne les différentes couches
+                    if self.heat_map_layer[couche][x][y] < point:
+                        point = self.heat_map_layer[couche][x][y]
+                point = ceil(sqrt(point))  # uniformise les valeurs des points
+                self.heat_map[y].append(point)
+
+    def make_map(self, arbre, buisson, herbe):
+        """ construit une version ascii de la map"""
+        nb_bosquets = ceil(sqrt(self.hauteur * self.largeur) / 10)
+        self.make_heat_map(nb_bosquets)
+        self.ascii_map = []
+        for y in range(0, self.hauteur):
+            self.ascii_map.append([])
+            for x in range(0, self.largeur):
+                if self.heat_map[y][x] <= 2:  # haute densité
+                    proba_grand_arbre = 0.7
+                    proba_herbe = 0.2
+                    proba_buisson = 0.1
+                elif 3 >= self.heat_map[y][x] >= 4:  # moyenne densité
+                    proba_grand_arbre = 0.2
+                    proba_herbe = 0.2
+                    proba_buisson = 0.6
+
+
+
+
+
 
 def main():
     """teste la generation de map"""
-    map_de_test = Map(5, 5)
-    map_de_test.make_heat_map(3)
-    display(map_de_test.heat_map[0])
+    map_de_test = Map(30, 30)
+    map_de_test.make_map("O", "#", ".")
+    display(map_de_test.heat_map)
 
 
 if __name__ == "__main__":

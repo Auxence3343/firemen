@@ -1,5 +1,6 @@
 from random import *
 from math import *
+from classes_images import *
 
 
 def display(carte):
@@ -9,6 +10,39 @@ def display(carte):
         for x in y:
             print(x, "| ", end="")
         print("")
+
+
+class Arbre:
+    def __init__(self, x, y, espece, alive, burning, dead, canvas):
+        self.state = "alive"
+        self.espece = espece  # le type d'arbre ( herbe, arbre, buisson )
+        self.canvas = canvas
+
+        if self.type == "arbre":
+            self.time_before_death = 6
+        elif self.type == "buisson":
+            self.time_before_death = 4
+        else:
+            self.time_before_death = 2
+
+        self.alive = PhotoImage(file=alive)
+        self.burning = PhotoImage(file=burning)
+        self.dead = PhotoImage(file=dead)
+
+        self.image = Image(x, y, self.alive, self.canvas)
+
+    def burn(self):
+        self.state = "burning"
+        self.image.image['file'] = self.burning
+
+    def is_burnt(self):
+        if self.state == "burning" :
+            if self.time_before_death > 0:
+                self.time_before_death -= 1
+            else:
+                self.state = "burnt"
+                self.image.image['file'] = self.burnin
+
 
 
 class Map:
@@ -88,13 +122,13 @@ class Map:
                 else:
                     self.map[y].append(buisson)
 
-        display(self.heat_map)
+        #  display(self.heat_map)
         display(self.map)
 
 
 def main():
     """teste la generation de map"""
-    map_de_test = Map(30, 30)
+    map_de_test = Map(50, 50)
     map_de_test.make_map("/\\", "##", "..")
 
 

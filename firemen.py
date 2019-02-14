@@ -15,7 +15,7 @@ class App:
         self.canvas.pack()
 
         self.map = Map(20, 10)
-        
+
         self.refresh()
         self.root.mainloop()
 

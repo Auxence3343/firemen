@@ -25,3 +25,5 @@ class Image:
 
         self.move(delta_x, delta_y)
 
+    def change_image(self, nouvelle_image):
+        self.image['file'] = nouvelle_image

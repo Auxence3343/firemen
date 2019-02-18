@@ -7,7 +7,7 @@ class Image:
         self.x = x
         self.y = y
         self.canvas = canvas
-        print(file)
+
         self.file = PhotoImage(file=file)
         self.image = self.canvas.create_image(x, y, image=self.file)
         self.canvas.update()

@@ -125,7 +125,7 @@ class Map:
                     self.map[y].append(buisson)
 
         #  display(self.heat_map)
-        display(self.map)
+        #  display(self.map)
 
 
 class Matrix:
@@ -165,7 +165,7 @@ class Matrix:
                     image_vivant = "herbe.gif"
                     image_en_feu = "feu.gif"
                     image_mort = "cendres.gif"
-                print(ligne, colonne)
+
                 self.map.append(Arbre(x=pos_arbre_x + self.largeur_image/2, y=pos_arbre_y + self.hauteur_image/2,
                                       espece=espece, alive=image_vivant,
                                       burning=image_en_feu, dead=image_mort, canvas=canvas))

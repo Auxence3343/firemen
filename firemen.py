@@ -14,7 +14,7 @@ class App:
         self.canvas = Canvas(self.root, width=self.largeur, height=self.hauteur, background="#000")
         self.canvas.pack()
 
-        self.map = Matrix(hauteur=50, largeur=50, canvas=self.canvas)
+        self.map = Matrix(hauteur=720//16 + 1, largeur=1080//16 + 1, canvas=self.canvas)
 
         self.refresh()
         self.root.mainloop()
@@ -27,7 +27,7 @@ class App:
 
 
 def main():
-    App(hauteur=800, largeur=800)
+    App(hauteur=720, largeur=1080)
 
 
 if __name__ == "__main__":

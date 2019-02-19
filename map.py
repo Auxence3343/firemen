@@ -13,7 +13,7 @@ def display(carte):
 
 
 class Arbre:
-    def __init__(self, x, y, espece, alive, burning, dead, canvas):
+    def __init__(self, x, y, espece, alive, burning, dead, canvas, pos_matrix_x, pos_matrix_y):
         self.state = "alive"
         self.espece = espece  # le type d'arbre ( herbe, arbre, buisson )
         self.canvas = canvas
@@ -29,7 +29,7 @@ class Arbre:
         self.burning = burning
         self.dead = dead
 
-        self.image = Image(x, y, self.alive, self.canvas)
+        self.image = Image(x, y, self.alive, self.canvas, screen_origin_x=pos_matrix_x, screen_origin_y=pos_matrix_y)
 
     def make_burn(self):
         self.state = "burning"
@@ -60,6 +60,11 @@ class Map:
 
         self.make_map("/\\", "##", "..")
 
+        del self.list_heat_points
+        del self.list_heat_points_visited
+        del self.heat_map
+        del self.heat_map_layer
+
     def generate_heat_map_layer(self):
         """ crée une couche de la heat map """
 
@@ -67,8 +72,8 @@ class Map:
         self.list_heat_points_visited.append([])
         self.list_heat_points.append([])
         layer = len(self.heat_map_layer) - 1
-        x = randint(0, self.hauteur - 1)
-        y = randint(0, self.largeur - 1)
+        x = randint(0, self.largeur - 1)
+        y = randint(0, self.hauteur - 1)
 
         for y_list in range(self.hauteur):
             self.heat_map_layer[layer].append([])
@@ -137,13 +142,14 @@ class Matrix:
         self.pos_matrix_x = 0
         self.pos_matrix_y = 0
 
-        self.map_in_ascii = Map(hauteur, largeur).map
-
+        self.map_in_ascii = Map(hauteur=hauteur, largeur=largeur).map
+        #  display(self.map_in_ascii)
+        self.canvas = canvas
         self.map = []
-
+        canvas.update()
         for ligne in range(len(self.map_in_ascii)):
             self.map.append([])
-            for colonne in range(len(self.map_in_ascii)):
+            for colonne in range(len(self.map_in_ascii[ligne])):
 
                 symbole_ascii = self.map_in_ascii[ligne][colonne]
 
@@ -165,10 +171,11 @@ class Matrix:
                     image_vivant = "herbe.gif"
                     image_en_feu = "feu.gif"
                     image_mort = "cendres.gif"
-
+                print((ligne - 1) * largeur + colonne)
                 self.map.append(Arbre(x=pos_arbre_x + self.largeur_image/2, y=pos_arbre_y + self.hauteur_image/2,
-                                      espece=espece, alive=image_vivant,
-                                      burning=image_en_feu, dead=image_mort, canvas=canvas))
+                                      espece=espece, alive=image_vivant, pos_matrix_x=self.pos_matrix_x,
+                                      pos_matrix_y=self.pos_matrix_y, burning=image_en_feu, dead=image_mort,
+                                      canvas=canvas))
 
 
 def main():

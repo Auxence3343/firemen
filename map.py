@@ -216,18 +216,21 @@ class Matrix:
         x_min_matrix = 0
         y_min_matrix = 0
 
-        x_max_matrix = len(self.map) - 1
+        y_max_matrix = len(self.map) - 1
+        for ligne in range(len(self.map)):
 
-        for ligne in range(len(self.map) - 1):
-            y_max_matrix = len(self.map[ligne]) - 1
-            for colonne in range(len(self.map) - 1):
-                arbre = self.map[colonne][ligne]
+            x_max_matrix = len(self.map[ligne]) - 1
+            for colonne in range(len(self.map[ligne])):
+
+                arbre = self.map[ligne][colonne]
                 arbre.check_combustion_stage()
+
                 if arbre.state == "propagating fire":
                     voisins = [[arbre.x_matrix_arbre + 1, arbre.y_matrix_arbre],
                                [arbre.x_matrix_arbre, arbre.y_matrix_arbre + 1],
                                [arbre.x_matrix_arbre - 1, arbre.y_matrix_arbre],
                                [arbre.x_matrix_arbre, arbre.y_matrix_arbre - 1]]
+
                     for case in voisins:
                         #  print(case)
                         if x_min_matrix <= case[0] <= x_max_matrix and y_min_matrix <= case[1] <= y_max_matrix:

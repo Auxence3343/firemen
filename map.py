@@ -31,7 +31,7 @@ class Arbre:
             self.time_before_death = 4
         else:
             self.time_before_death = 2
-
+        self.time_before_death *= randint(6, 14)/10
         self.alive = alive
         self.burning = burning
         self.dead = dead

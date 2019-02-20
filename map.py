@@ -40,7 +40,7 @@ class Arbre:
 
     def make_burn(self):
         """ met le feu a l'arbre"""
-        if self.state == "alive" :
+        if self.state == "alive":
             self.state = "burning"
             self.date_de_mise_a_feu = time()
             self.image.change_image(self.burning)

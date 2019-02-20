@@ -2,6 +2,8 @@ from tkinter import *
 
 
 class Image:
+    """ cette classe regroupe touts le code destiné a la manipulation d'images
+     afin de simplifier la gestion de celles ci"""
     def __init__(self, x, y, file, canvas, screen_origin_x, screen_origin_y):
         __slots__ = 'canvas'
 
@@ -15,24 +17,23 @@ class Image:
             self.image = self.canvas.create_image(x, y, image=self.file)
         else:
             self.image = 0
-            print(x, y, screen_origin_x, screen_origin_y,
-                  screen_origin_x <= x <= screen_origin_x + self.canvas.winfo_width(),
-                  screen_origin_x + self.canvas.winfo_width())
+
         self.canvas.update()
 
     def move(self, delta_x, delta_y):
-
+        """ déplace l'image relativement a sa position precedente """
         self.canvas.move(self.image, delta_x, delta_y)
         self.x += delta_x
         self.y += delta_y
         self.canvas.update()
 
     def move_to(self, x, y):
-
+        """ déplace l'image a une position absolue du canvas"""
         delta_x = self.x + x
         delta_y = self.y + y
 
         self.move(delta_x, delta_y)
 
     def change_image(self, nouvelle_image):
-        self.image['file'] = nouvelle_image
+        """ change l'image """
+        self.image['file'] = PhotoImage(file=nouvelle_image)

@@ -23,12 +23,14 @@ class App:
         """ fonction qui se relance a chaque 'tick' du jeu"""
         self.canvas.update()
 
+
         self.root.after(0, self.refresh)
 
 
 def main():
+    """ une fonction 'main' au cas ou le jeu est appelé depuis un autre fichier sous ce nom là"""
     App(hauteur=720, largeur=1080)
 
 
 if __name__ == "__main__":
-    main()
+    App(hauteur=720, largeur=1080)

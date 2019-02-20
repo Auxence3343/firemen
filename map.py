@@ -1,6 +1,7 @@
 from random import *
 from math import *
 from classes_images import *
+from time import *
 
 
 def display(carte):
@@ -13,10 +14,12 @@ def display(carte):
 
 
 class Arbre:
+    """ représente un arbre"""
     def __init__(self, x, y, espece, alive, burning, dead, canvas, pos_matrix_x, pos_matrix_y):
         self.state = "alive"
         self.espece = espece  # le type d'arbre ( herbe, arbre, buisson )
         self.canvas = canvas
+        self.date_de_mise_a_feu = 0
 
         if self.espece == "arbre":
             self.time_before_death = 6
@@ -32,22 +35,33 @@ class Arbre:
         self.image = Image(x, y, self.alive, self.canvas, screen_origin_x=pos_matrix_x, screen_origin_y=pos_matrix_y)
 
     def make_burn(self):
+        """ met le feu a l'arbre"""
         self.state = "burning"
         self.image.image['file'] = self.burning
 
-    def is_burnt(self):
-        if self.state == "burning":
-            if self.time_before_death > 0:
-                self.time_before_death -= 1
-            else:
-                self.state = "burnt"
-                self.image.image['file'] = self.burning
+    def kill(self):
+        """ tue la plante"""
+        self.state = "dead"
+        self.image.image['file'] = self.dead
+
+    def check_combustion_stage(self):
+        """ regarde ou la plante en est dans sa combustion"""
+        if self.state == "burning" or self.state == "propagating fire":
+            heure_actuelle = time()
+            temps_depuis_la_mise_a_feu = heure_actuelle - self.date_de_mise_a_feu
+            if temps_depuis_la_mise_a_feu > self.time_before_death:
+                self.kill()
+            elif self.state == "burning" and temps_depuis_la_mise_a_feu > self.time_before_death / 2:
+                self.state = "propagating fire"
 
     def shift(self, delta_x, delta_y):
+        """ déplace l'arbre"""
         self.image.move_to(delta_x, delta_y)
 
 
 class Map:
+    """ cette classe sert a générer la map sous la forme de caractères ascii, la veritable carte avec les instances
+    d'arbres se trouve dans la classe matrix"""
     def __init__(self, largeur, hauteur):
         """ crée la map"""
         self.hauteur = hauteur
@@ -66,7 +80,7 @@ class Map:
         del self.heat_map_layer
 
     def generate_heat_map_layer(self):
-        """ crée une couche de la heat map """
+        """ crée une couche de la heat map (voir ci dessous)"""
 
         self.heat_map_layer.append([])
         self.list_heat_points_visited.append([])
@@ -134,6 +148,12 @@ class Map:
 
 
 class Matrix:
+    """ gère la 'vraie' carte une fois qu'elle a ete générée par la classe Map
+    Matrix s'occupe de :
+        - l'affichage de la carte
+        - la simulation de la propagation du feu
+        - le déplacement de la vue du joueur ( en réalité, on 'déplace' juste la carte dans le sens inverse au
+         déplacement de la camera"""
     def __init__(self, hauteur, largeur, canvas):
 
         self.hauteur_image = 16
@@ -142,10 +162,12 @@ class Matrix:
         self.pos_matrix_x = 0
         self.pos_matrix_y = 0
 
-        self.map_in_ascii = Map(hauteur=hauteur, largeur=largeur).map
+        self.map_in_ascii = Map(hauteur=hauteur, largeur=largeur).map  # recupere la carte generee par Map
         #  display(self.map_in_ascii)
         self.canvas = canvas
         self.map = []
+
+        # le code ci dessous "traduit" l'ascii en classes 'Arbre'
         canvas.update()
         for ligne in range(len(self.map_in_ascii)):
             self.map.append([])
@@ -171,11 +193,29 @@ class Matrix:
                     image_vivant = "herbe.gif"
                     image_en_feu = "feu.gif"
                     image_mort = "cendres.gif"
-                print((ligne - 1) * largeur + colonne)
+
                 self.map.append(Arbre(x=pos_arbre_x + self.largeur_image/2, y=pos_arbre_y + self.hauteur_image/2,
                                       espece=espece, alive=image_vivant, pos_matrix_x=self.pos_matrix_x,
                                       pos_matrix_y=self.pos_matrix_y, burning=image_en_feu, dead=image_mort,
                                       canvas=canvas))
+
+    def update_fire(self):
+        """ met a jour la propagation du feu"""
+        x_min_matrix = 0
+        y_min_matrix = 0
+
+        x_max_matrix = len(self.map) - 1
+        y_max_matrix = len(self.map[0]) - 1
+
+        for ligne in self.map:
+            for arbre in ligne:
+                arbre.check_combustion_stage()
+                if arbre.state == "propagating fire":
+                    voisins = [(arbre.x + 1, arbre.y), (arbre.x, arbre.y + 1),
+                               (arbre.x - 1, arbre.y), (arbre.x, arbre.y - 1)]
+                    for case in voisins:
+                        if x_min_matrix <= case[0] <= x_max_matrix and y_min_matrix <= case[1] <= y_max_matrix:
+                            self.map[case[1], case[0]].make_burn()
 
 
 def main():

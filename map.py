@@ -15,11 +15,15 @@ def display(carte):
 
 class Arbre:
     """ représente un arbre"""
-    def __init__(self, x, y, espece, alive, burning, dead, canvas, pos_matrix_x, pos_matrix_y):
+    def __init__(self, x, y, espece, alive, burning, dead, canvas, pos_matrix_x, pos_matrix_y,
+                 x_matrix_arbre, y_matrix_arbre):
         self.state = "alive"
         self.espece = espece  # le type d'arbre ( herbe, arbre, buisson )
         self.canvas = canvas
         self.date_de_mise_a_feu = 0
+        # position de la case de l'arbre dans la matrice
+        self.x_matrix_arbre = x_matrix_arbre
+        self.y_matrix_arbre = y_matrix_arbre
 
         if self.espece == "arbre":
             self.time_before_death = 6
@@ -36,13 +40,15 @@ class Arbre:
 
     def make_burn(self):
         """ met le feu a l'arbre"""
-        self.state = "burning"
-        self.image.image['file'] = self.burning
+        if self.state == "alive" :
+            self.state = "burning"
+            self.date_de_mise_a_feu = time()
+            self.image.change_image(self.burning)
 
     def kill(self):
         """ tue la plante"""
         self.state = "dead"
-        self.image.image['file'] = self.dead
+        self.image.change_image(self.dead)
 
     def check_combustion_stage(self):
         """ regarde ou la plante en est dans sa combustion"""
@@ -171,6 +177,7 @@ class Matrix:
         canvas.update()
         for ligne in range(len(self.map_in_ascii)):
             self.map.append([])
+            canvas.update()
             for colonne in range(len(self.map_in_ascii[ligne])):
 
                 symbole_ascii = self.map_in_ascii[ligne][colonne]
@@ -194,10 +201,15 @@ class Matrix:
                     image_en_feu = "feu.gif"
                     image_mort = "cendres.gif"
 
-                self.map.append(Arbre(x=pos_arbre_x + self.largeur_image/2, y=pos_arbre_y + self.hauteur_image/2,
-                                      espece=espece, alive=image_vivant, pos_matrix_x=self.pos_matrix_x,
-                                      pos_matrix_y=self.pos_matrix_y, burning=image_en_feu, dead=image_mort,
-                                      canvas=canvas))
+                self.map[ligne].append(Arbre(x=pos_arbre_x + self.largeur_image/2, y=pos_arbre_y + self.hauteur_image/2,
+                                             espece=espece, alive=image_vivant, pos_matrix_x=self.pos_matrix_x,
+                                             pos_matrix_y=self.pos_matrix_y, burning=image_en_feu, dead=image_mort,
+                                             canvas=canvas, x_matrix_arbre=colonne, y_matrix_arbre=ligne))
+
+        self.map[randint(0, len(self.map) - 1)][randint(0, len(self.map) - 1)].make_burn()
+
+    def strafe(self, x, y):
+        pass
 
     def update_fire(self):
         """ met a jour la propagation du feu"""
@@ -205,17 +217,21 @@ class Matrix:
         y_min_matrix = 0
 
         x_max_matrix = len(self.map) - 1
-        y_max_matrix = len(self.map[0]) - 1
 
-        for ligne in self.map:
-            for arbre in ligne:
+        for ligne in range(len(self.map) - 1):
+            y_max_matrix = len(self.map[ligne]) - 1
+            for colonne in range(len(self.map) - 1):
+                arbre = self.map[colonne][ligne]
                 arbre.check_combustion_stage()
                 if arbre.state == "propagating fire":
-                    voisins = [(arbre.x + 1, arbre.y), (arbre.x, arbre.y + 1),
-                               (arbre.x - 1, arbre.y), (arbre.x, arbre.y - 1)]
+                    voisins = [[arbre.x_matrix_arbre + 1, arbre.y_matrix_arbre],
+                               [arbre.x_matrix_arbre, arbre.y_matrix_arbre + 1],
+                               [arbre.x_matrix_arbre - 1, arbre.y_matrix_arbre],
+                               [arbre.x_matrix_arbre, arbre.y_matrix_arbre - 1]]
                     for case in voisins:
+                        #  print(case)
                         if x_min_matrix <= case[0] <= x_max_matrix and y_min_matrix <= case[1] <= y_max_matrix:
-                            self.map[case[1], case[0]].make_burn()
+                            self.map[case[1]][case[0]].make_burn()
 
 
 def main():

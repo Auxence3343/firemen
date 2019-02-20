@@ -22,7 +22,7 @@ class App:
     def refresh(self):
         """ fonction qui se relance a chaque 'tick' du jeu"""
         self.canvas.update()
-
+        self.map.update_fire()
 
         self.root.after(0, self.refresh)
 

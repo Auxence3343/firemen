@@ -220,8 +220,7 @@ class Matrix:
 
 def main():
     """teste la generation de map"""
-    map_de_test = Map(50, 50)
-    map_de_test.make_map("/\\", "##", "..")
+    display(Map(50, 50).map)
 
 
 if __name__ == "__main__":

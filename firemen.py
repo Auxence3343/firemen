@@ -14,17 +14,17 @@ class App:
         self.canvas = Canvas(self.root, width=self.largeur, height=self.hauteur, background="#000")
         self.canvas.pack()
 
-        self.map = Matrix(hauteur=720//16 + 1, largeur=1080//16 + 1, canvas=self.canvas)
+        self.carte = Matrice(hauteur=720 // 16 + 1, largeur=1080 // 16 + 1, canvas=self.canvas)
 
-        self.refresh()
+        self.routine()
         self.root.mainloop()
 
-    def refresh(self):
+    def routine(self):
         """ fonction qui se relance a chaque 'tick' du jeu"""
         self.canvas.update()
-        self.map.update_fire()
+        self.carte.actualiser_l_incendie()
 
-        self.root.after(0, self.refresh)
+        self.root.after(0, self.routine)
 
 
 def main():

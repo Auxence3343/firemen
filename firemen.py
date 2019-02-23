@@ -2,6 +2,7 @@ from time import *
 from tkinter import *
 from classes_images import *
 from map import *
+from pompiers import *
 
 
 class App:
@@ -15,14 +16,14 @@ class App:
         self.canvas.pack()
 
         self.carte = Matrice(hauteur=720 // 16 + 1, largeur=1080 // 16 + 1, canvas=self.canvas)
-
+        self.pompier = ToutLesPompiers(Matrice)
         self.routine()
         self.root.mainloop()
 
     def routine(self):
         """ fonction qui se relance a chaque 'tick' du jeu"""
         self.canvas.update()
-        self.carte.actualiser_l_incendie()
+        self.carte.actualiser_l_incendie("mode_normal")
 
         self.root.after(0, self.routine)
 

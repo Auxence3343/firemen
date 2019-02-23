@@ -15,7 +15,8 @@ def afficher_carte(carte):
 
 class Arbre:
     """ représente un arbre"""
-    def __init__(self, x, y, espece, image_vivant, image_en_feu, image_mort, canvas, pos_matrice_x, pos_matrice_y,
+    def __init__(self, x, y, espece, image_vivant, image_en_feu, image_mort, image_fumee, canvas,
+                 pos_matrice_x, pos_matrice_y,
                  abscisse_de_l_arbre_dans_la_matrice, ordonne_de_l_arbre_dans_la_matrice):
         self.etat = "vivant"
         self.espece = espece  # le type d'arbre ( herbe, arbre, buisson )
@@ -27,25 +28,34 @@ class Arbre:
         self.y_matrice_arbre = ordonne_de_l_arbre_dans_la_matrice
 
         if self.espece == "arbre":
-            self.temps_avant_la_mort = 0.5
+            self.temps_avant_la_mort = 20
         elif self.espece == "buisson":
-            self.temps_avant_la_mort = 0.5
+            self.temps_avant_la_mort = 12
         else:
-            self.temps_avant_la_mort = 0.5
+            self.temps_avant_la_mort = 8
         self.temps_avant_la_mort *= randint(6, 14) / 10
         self.image_vivant = image_vivant
         self.image_en_feu = image_en_feu
         self.image_mort = image_mort
+        self.image_fumee = image_fumee
 
         self.image = Image(x, y, self.image_vivant, self.canvas,
                            origine_ecran_x=pos_matrice_x, origine_ecran_y=pos_matrice_y)
 
-    def faire_bruler(self):
+    def faire_bruler(self, mode_de_simulation):
         """ met le feu a l'arbre"""
-        if self.etat == "vivant":
+        if self.etat == "vivant" and mode_de_simulation != "instantane":
             self.etat = "en feu"
             self.date_de_mise_a_feu = time()
             self.image.change_image(self.image_en_feu)
+        elif self.etat == "vivant":
+            self.etat = "propage le feu"
+            self.date_de_mise_a_feu = time()
+            self.image.change_image(self.image_en_feu)
+
+    def faire_fumer(self):
+        self.etat = "fumant"
+        self.image.change_image(self.image_fumee)
 
     def tuer(self):
         """ tue la plante"""
@@ -54,13 +64,15 @@ class Arbre:
 
     def actualiser_la_combustion(self):
         """ regarde ou la plante en est dans sa combustion"""
-        if self.etat == "en feu" or self.etat == "propage le feu":
+        if self.etat == "en feu" or self.etat == "propage le feu" or self.etat == "fumant":
             heure_actuelle = time()
             temps_depuis_la_mise_a_feu = heure_actuelle - self.date_de_mise_a_feu
             if temps_depuis_la_mise_a_feu > self.temps_avant_la_mort:
                 self.tuer()
-            elif self.etat == "en feu" and temps_depuis_la_mise_a_feu > self.temps_avant_la_mort / 2:
+            elif self.etat == "en feu" and temps_depuis_la_mise_a_feu > self.temps_avant_la_mort / 4:
                 self.etat = "propage le feu"
+            elif self.etat == "propage le feu" and temps_depuis_la_mise_a_feu > self.temps_avant_la_mort / 2:
+                self.faire_fumer()
 
     def shift(self, delta_x, delta_y):
         """ déplace l'arbre"""
@@ -194,16 +206,19 @@ class Matrice:
                     image_vivant = "arbre.gif"
                     image_en_feu = "feu.gif"
                     image_mort = "cendres.gif"
+                    image_fumee = "fumee.gif"
                 elif symbole_ascii == "##":
                     espece = "buisson"
                     image_vivant = "buisson.gif"
                     image_en_feu = "feu.gif"
                     image_mort = "cendres.gif"
+                    image_fumee = "fumee.gif"
                 else:
                     espece = "herbe"
                     image_vivant = "herbe.gif"
                     image_en_feu = "feu.gif"
                     image_mort = "cendres.gif"
+                    image_fumee = "fumee.gif"
 
                 self.map[ligne].append(Arbre(x=pos_arbre_x + self.largeur_image/2, y=pos_arbre_y + self.hauteur_image/2,
                                              espece=espece,
@@ -211,16 +226,20 @@ class Matrice:
                                              image_vivant=image_vivant,
                                              image_en_feu=image_en_feu,
                                              image_mort=image_mort,
+                                             image_fumee=image_fumee,
                                              canvas=canvas,
                                              abscisse_de_l_arbre_dans_la_matrice=colonne,
                                              ordonne_de_l_arbre_dans_la_matrice=ligne))
 
-        self.map[randint(0, len(self.map) - 1)][randint(0, len(self.map) - 1)].faire_bruler()
+        self.map[randint(0, len(self.map) - 1)][randint(0, len(self.map) - 1)].faire_bruler("instantane")
+        for i in range(5):
+            self.actualiser_l_incendie("initialisation")
+            print("init")
 
     def deplacer_matrice(self, x, y):
         pass
 
-    def actualiser_l_incendie(self):
+    def actualiser_l_incendie(self, mode):
         """ met a jour la propagation du feu"""
         x_min_matrice = 0
         y_min_matrice = 0
@@ -242,7 +261,16 @@ class Matrice:
 
                     for case in voisins:
                         if x_min_matrice <= case[0] <= x_max_matrice and y_min_matrice <= case[1] <= y_max_matrice:
-                            self.map[case[1]][case[0]].faire_bruler()
+                            self.map[case[1]][case[0]].faire_bruler(mode)
+
+    def infos_sur_la_case(self, x, y):
+        """ renvoie l'etat (vivant, en feu, propage le feu, fumant ou mort) et l'espece (arbre, buisson ou herbe)
+        d'une case donnée"""
+        try:
+            case = self.map[x][y]
+            return [case.etat, case.espece]
+        except():
+            return "error"
 
 
 def main():
